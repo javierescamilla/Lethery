@@ -21,9 +21,9 @@ let userSchema = mongoose.Schema({
 
 let Uservar = mongoose.model('User', userSchema);
 
-let UserList = {
+let UserMethods = {
     getUser : function(userId){
-		return Uservar.findOne(userId)
+        return Uservar.findOne(userId)
 				.then( blog => {
 					return blog;
 				})
@@ -60,4 +60,4 @@ let UserList = {
     }
 }
 
-module.exports = { UserList };
+module.exports = { UserMethods };

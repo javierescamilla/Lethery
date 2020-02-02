@@ -1,0 +1,26 @@
+{
+  "name": "proyecto-final",
+  "version": "1.0.0",
+  "description": "Lethery",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/javierescamilla/Lethery.git"
+  },
+  "author": "Javier Escamilla; Mariano Uvalle Garza",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/javierescamilla/Lethery/issues"
+  },
+  "homepage": "https://github.com/javierescamilla/Lethery#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.8.11",
+    "morgan": "^1.9.1",
+    "uuid4": "^1.1.4"
+  }
+}
