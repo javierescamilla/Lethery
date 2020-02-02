@@ -23,9 +23,21 @@ app.use(function(req, res, next) {
   next();
 });
 
+function validUserEmail(email){
+    return true;
+}
+
+function encryptPassword(password){
+    return password;
+}
+
+function validUserId(userId){
+    return true;
+}
+
 app.get("/users/:userId", (req, res) => {
   let userId = req.params.userId;
-  UserMethods.getUser({ userId: userId })
+  UserMethods.getUser({ userId : userId })
     .then(userResponse => {
       return res.status(200).json(userResponse);
     })
@@ -39,6 +51,7 @@ app.get("/users/:userId", (req, res) => {
 });
 
 app.post("/users", jsonParser, (req, res) => {
+    
   let email = req.body.email;
   let password = req.body.password;
   let firstName = req.body.firstName;
@@ -62,10 +75,18 @@ app.post("/users", jsonParser, (req, res) => {
     });
   }
 
+  if(!validUserEmail(email)){
+    res.statusMessage = "This email is already used";
+    return res.status(406).json({
+      message: "This email is already used",
+      status: 406
+    });
+  }
+
   let newUser = {
     userId: uuid(),
     email: email,
-    password: password,
+    password: encryptPassword(password),
     firstName: firstName,
     lastName: lastName,
     shippingAddress: shippingAddress,
@@ -79,7 +100,7 @@ app.post("/users", jsonParser, (req, res) => {
     billingState: billingState,
     billingCountry: billingCountry
   };
-  console.log();
+
   UserMethods.postUser(newUser)
     .then(userResponse => {
       return res.status(201).json(userResponse);
@@ -91,6 +112,60 @@ app.post("/users", jsonParser, (req, res) => {
         status: 500
       });
     });
+});
+
+app.put('/users/:userId', jsonParser, (req, res) => {
+    let updatedUserId = req.params.userId;
+
+    if(!updatedUserId){
+        res.statusMessage = "Missing userId";
+        return res.status(406).json({
+           "error" : "Missing userId",
+           "status" : 406
+       });
+    }
+
+    if(!validUserId(updatedUserId)){
+        res.statusMessage = "userId not found";
+        return res.status(406).json({
+          message: "userId not found",
+          status: 406
+        });
+    }
+
+    UserMethods.modifyUserInfo({ userId : updatedUserId }, req.body)
+       .then(userResponse => {
+           res.status(201).json(userResponse);
+       })
+       .catch(err => {
+           res.statusMessage = "Something went wrong with the data base";
+           return res.status(500).json({
+               "error" : "Something went wrong with the data base",
+               "status" : 500
+           });
+       });
+});
+
+app.delete('/users/:userId', (req, res) => {
+    let userId = req.params.userId;
+    if(!userId){
+        res.statusMessage = "Missing field id";
+        return res.status(406).json({
+           "error" : "Missing id",
+           "status" : 406
+       });
+    }
+    UserMethods.deleteUser({ userId : userId })
+       .then(userResponse => {
+           res.status(201).json(userResponse);
+       })
+       .catch(err => {
+           res.statusMessage = "Something went wrong with the data base";
+           return res.status(500).json({
+               "error" : "Something went wrong with the data base",
+               "status" : 500
+           });
+       });
 });
 
 let server;

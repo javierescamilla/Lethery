@@ -2,7 +2,7 @@ let mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
 let userSchema = mongoose.Schema({
-    userId : {type : String, required : true},
+    userId : {type : String},
     email : {type : String},
     password : {type : String},
     firstName : {type : String},
@@ -50,7 +50,7 @@ let UserMethods = {
                 });
     },
     deleteUser :  function(userId){
-        return Uservar.deleteOne(user)
+        return Uservar.deleteOne(userId)
             .then( blog => {
                 return blog;
             })
