@@ -379,15 +379,17 @@ app.post("/login", jsonParser, (req, res) => {
         userId: userId,
         isAdmin: isAdmin,
       };
-      var token = jwt.sign(user, privateKey, { expiresIn: '30s' });
+      var token = jwt.sign(user, privateKey, { expiresIn: '3000s' });
+      let object = {
+        token : token,
+        isAdmin: isAdmin
+      }
       let status = bcrypt.compareSync(typedPassword, hash);
       if (status) {
-        return res.status(200).json(token);
+        return res.status(200).json(object);
       } else {
-        return res.status(401).json({
-          error: "Wrong password",
-          status: 401
-        });
+        res.statusMessage = "Wrong password"
+        return res.status(401).send()
       }
     })
     .catch(err => {

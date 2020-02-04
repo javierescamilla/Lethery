@@ -7,17 +7,11 @@ let userSchema = mongoose.Schema({
     password : {type : String},
     firstName : {type : String},
     lastName : {type : String},
-    isAdmin: {type : String},
     shippingAddress : {type : String},
     shippingZipCode : {type : String},
     shippingCity : {type : String},
     shippingState : {type : String},
     shippingCountry : {type : String},
-    billingAddress : {type : String},
-    billingZipCode : {type : String},
-    billingCity : {type : String},
-    billingState : {type : String},
-    billingCountry : {type : String}
 });
 
 let Uservar = mongoose.model('User', userSchema);
