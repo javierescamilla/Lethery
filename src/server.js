@@ -6,7 +6,7 @@ let AWS = require("aws-sdk");
 let app = express();
 let bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
-let jsw = require("jsonwebtoken");
+let jwt = require("jsonwebtoken");
 const saltRounds = 10;
 let jsonParser = bodyParser.json();
 
@@ -207,6 +207,12 @@ app.post("/orders", jsonParser, (req, res) => {
   let items = req.body.items;
   let total = req.body.total;
   let timestamp = req.body.timestamp;
+  let token = req.body.token;
+
+
+  console.log(token)
+  var decoded = jwt.verify(token, "gsfbsandfkams75rfdkjne28ednks");
+  console.log(decoded.foo);
 
   let newOrder = {
     userId: userId,
@@ -223,7 +229,6 @@ app.post("/orders", jsonParser, (req, res) => {
     total: total,
     timestamp: timestamp
   };
-
   OrderMethods.postSortedOrder(newOrder)
     .then(userResponse => {
       return res.status(201).json(userResponse);
@@ -333,17 +338,35 @@ app.delete("/products/:productId", (req, res) => {
 app.post("/login", jsonParser, (req, res) => {
   let email = req.body.email;
   let typedPassword = req.body.password;
+  let isAdmin = "false";
+  var privateKey = "gsfbsandfkams75rfdkjne28ednks";
+  //var MINUTE = 60;
+  //let privateKey = process.environ.privateKey;
 
   UserMethods.getUser({ email: email })
     .then(userResponse => {
       let hash = userResponse["password"];
+      let userId = userResponse["userId"];
+      let user = {
+        userId: userId,
+        isAdmin: isAdmin,
+        //exp: Math.floor(Date.now() / 1000) + MINUTE
+      };
+      var token = jwt.sign(user, privateKey);
       let status = bcrypt.compareSync(typedPassword, hash);
-      return res.status(200).json(status);
+      if (status) {
+        return res.status(200).json(token);
+      } else {
+        return res.status(401).json({
+          error: "Wrong password",
+          status: 401
+        });
+      }
     })
     .catch(err => {
-      res.statusMessage = "Something went wrong with the data base";
+      res.statusMessage = "The user does not exist";
       return res.status(500).json({
-        error: "Something went wrong with the data base",
+        error: "The user does not exist",
         status: 500
       });
     });
