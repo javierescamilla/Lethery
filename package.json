@@ -1,6 +1,9 @@
 {
   "name": "proyecto-final",
   "version": "1.0.0",
+  "engines": {
+    "node": "v10.16.3"
+  },
   "description": "Lethery",
   "main": "index.js",
   "scripts": {
@@ -18,7 +21,9 @@
   },
   "homepage": "https://github.com/javierescamilla/Lethery#readme",
   "dependencies": {
+    "bcrypt": "^3.0.7",
     "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.8.11",
     "morgan": "^1.9.1",
     "uuid4": "^1.1.4"

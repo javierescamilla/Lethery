@@ -30,7 +30,10 @@ let UserMethods = {
 				.catch( error => {
 					throw Error( error );
 				});
-	},
+    },
+    syncGetUser : function(userEmail){
+        return Uservar.findOne(userEmail);
+    },
     postUser : function(userInfo){
         return Uservar.create(userInfo)
                 .then( blog => {

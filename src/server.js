@@ -4,6 +4,9 @@ let mongoose = require("mongoose");
 let uuid = require("uuid4");
 let app = express();
 let bodyParser = require("body-parser");
+const bcrypt = require('bcrypt');
+let jsw = require('jsonwebtoken')
+const saltRounds = 10;
 let jsonParser = bodyParser.json();
 
 let { UserMethods } = require("./users/user-model");
@@ -25,16 +28,10 @@ app.use(function(req, res, next) {
   next();
 });
 
-function validUserEmail(email){
-    return true;
-}
-
 function encryptPassword(password){
-    return password;
-}
-
-function validUserId(userId){
-    return true;
+    var salt = bcrypt.genSaltSync(saltRounds);
+    var hash = bcrypt.hashSync(password, salt);
+    return hash;
 }
 
 app.get("/users/:userId", (req, res) => {
@@ -131,14 +128,6 @@ app.post("/users", jsonParser, (req, res) => {
     res.statusMessage = "Missing field in body";
     return res.status(406).json({
       message: "Missing field in body",
-      status: 406
-    });
-  }
-
-  if(!validUserEmail(email)){
-    res.statusMessage = "This email is already used";
-    return res.status(406).json({
-      message: "This email is already used",
       status: 406
     });
   }
@@ -340,6 +329,26 @@ app.delete('/products/:productId', (req, res) => {
            });
        });
 });
+
+app.post("/login", jsonParser, (req, res) => {
+
+    let email = req.body.email;
+    let typedPassword = req.body.password;
+  
+    UserMethods.getUser({email : email})
+      .then(userResponse => {
+        let hash = userResponse['password']
+        let status = bcrypt.compareSync(typedPassword, hash);
+        return res.status(200).json(status);
+      })
+      .catch(err => {
+        res.statusMessage = "Something went wrong with the data base";
+        return res.status(500).json({
+          error: "Something went wrong with the data base",
+          status: 500
+        });
+      });
+  });
 
 let server;
 
