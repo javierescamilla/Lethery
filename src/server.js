@@ -112,6 +112,7 @@ app.post("/users", jsonParser, (req, res) => {
   let password = req.body.password;
   let firstName = req.body.firstName;
   let lastName = req.body.lastName;
+  let isAdmin = req.body.isAdmin;
   let shippingAddress = req.body.shippingAddress;
   let shippingZipCode = req.body.shippingZipCode;
   let shippingCity = req.body.shippingCity;
@@ -137,6 +138,7 @@ app.post("/users", jsonParser, (req, res) => {
     password: encryptPassword(password),
     firstName: firstName,
     lastName: lastName,
+    isAdmin : isAdmin,
     shippingAddress: shippingAddress,
     shippingZipCode: shippingZipCode,
     shippingCity: shippingCity,
@@ -204,12 +206,24 @@ app.post("/orders", jsonParser, (req, res) => {
   let items = req.body.items;
   let total = req.body.total;
   let timestamp = req.body.timestamp;
-  let token = req.body.token;
+  let token = req.headers.authorization;
+  token = token.split(" ")
 
+  try {
+    var decoded = jwt.verify(token[1], 'gsfbsandfkams75rfdkjne28ednks');
+  } catch(err) {
+    return res.status(406).json({
+      message: "Invalid token",
+      status: 406
+    });
+  }
 
-  console.log(token)
-  var decoded = jwt.verify(token, "gsfbsandfkams75rfdkjne28ednks");
-  console.log(decoded.foo);
+  if(decoded['isAdmin'] != 'true'){
+    return res.status(406).json({
+      message: "User must have admin privileges",
+      status: 406
+    });
+  }
 
   let newOrder = {
     userId: userId,
@@ -336,7 +350,6 @@ app.delete("/products/:productId", (req, res) => {
 app.post("/login", jsonParser, (req, res) => {
   let email = req.body.email;
   let typedPassword = req.body.password;
-  let isAdmin = "false";
   var privateKey = "gsfbsandfkams75rfdkjne28ednks";
   //var MINUTE = 60;
   //let privateKey = process.environ.privateKey;
@@ -345,12 +358,12 @@ app.post("/login", jsonParser, (req, res) => {
     .then(userResponse => {
       let hash = userResponse["password"];
       let userId = userResponse["userId"];
+      let isAdmin = userResponse["isAdmin"];
       let user = {
         userId: userId,
         isAdmin: isAdmin,
-        //exp: Math.floor(Date.now() / 1000) + MINUTE
       };
-      var token = jwt.sign(user, privateKey);
+      var token = jwt.sign(user, privateKey, { expiresIn: '30s' });
       let status = bcrypt.compareSync(typedPassword, hash);
       if (status) {
         return res.status(200).json(token);
