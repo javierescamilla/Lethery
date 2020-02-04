@@ -374,7 +374,7 @@ app.post("/login", jsonParser, (req, res) => {
     .then(userResponse => {
       let hash = userResponse["password"];
       let userId = userResponse["userId"];
-      let isAdmin = userResponse["isAdmin"];
+      let isAdmin = !!userResponse["isAdmin"];
       let user = {
         userId: userId,
         isAdmin: isAdmin,
