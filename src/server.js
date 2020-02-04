@@ -104,6 +104,19 @@ app.get("/products", (req, res) => {
 app.get("/orders/:userId", (req, res) => {
   let userId = req.params.userId;
   let params = {};
+  let token = req.headers.authorization;
+  token = token.split(" ")
+
+  try {
+    var decoded = jwt.verify(token[1], 'gsfbsandfkams75rfdkjne28ednks');
+    console.log(decoded)
+  } catch(err) {
+    return res.status(406).json({
+      message: "Invalid token",
+      status: 406
+    });
+  }
+
   if (!userId) {
     res.statusMessage = "Missing userId";
     return res.status(406).json({
@@ -136,11 +149,6 @@ app.post("/users", jsonParser, (req, res) => {
   let shippingCity = req.body.shippingCity;
   let shippingState = req.body.shippingState;
   let shippingCountry = req.body.shippingCountry;
-  let billingAddress = req.body.billingAddress;
-  let billingZipCode = req.body.billingZipCode;
-  let billingCity = req.body.billingCity;
-  let billingState = req.body.billingState;
-  let billingCountry = req.body.billingCountry;
 
   if (!email | !password | !firstName | !lastName) {
     res.statusMessage = "Missing field in body";
@@ -161,12 +169,7 @@ app.post("/users", jsonParser, (req, res) => {
     shippingZipCode: shippingZipCode,
     shippingCity: shippingCity,
     shippingState: shippingState,
-    shippingCountry: shippingCountry,
-    billingAddress: billingAddress,
-    billingZipCode: billingZipCode,
-    billingCity: billingCity,
-    billingState: billingState,
-    billingCountry: billingCountry
+    shippingCountry: shippingCountry
   };
 
   UserMethods.postUser(newUser)
@@ -188,6 +191,25 @@ app.post("/products", jsonParser, (req, res) => {
   let category = req.body.category;
   let description = req.body.description;
   let imageUrl = req.body.imageUrl;
+  let token = req.headers.authorization;
+  token = token.split(" ")
+
+  try {
+    var decoded = jwt.verify(token[1], 'gsfbsandfkams75rfdkjne28ednks');
+    console.log(decoded)
+  } catch(err) {
+    return res.status(406).json({
+      message: "Invalid token",
+      status: 406
+    });
+  }
+
+  if(decoded['isAdmin'] != true){
+    return res.status(406).json({
+      message: "User must have admin privileges",
+      status: 406
+    });
+  }
 
   if (!name) {
     res.statusMessage = "Missing field: name in body";
