@@ -24,12 +24,13 @@ app.use(morgan("dev"));
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
+  res.header("Access-Control-Allow-Headers", "Content-Type,Authorization");
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE");
+  if (req.method === "OPTIONS") {
+  return res.send(204);
+  }
   next();
-});
+ });
 
 function encryptPassword(password) {
   var salt = bcrypt.genSaltSync(saltRounds);
@@ -64,11 +65,11 @@ app.get("/products", (req, res) => {
     params["name"] = name;
   }
   if (minRange) {
-    priceRange["$gt"] = minRange;
+    priceRange["$gte"] = minRange;
     params["price"] = priceRange;
   }
   if (maxRange) {
-    priceRange["$lt"] = maxRange;
+    priceRange["$lte"] = maxRange;
     params["price"] = priceRange;
   }
   if (minRange & maxRange) {
@@ -228,6 +229,7 @@ app.post("/orders", jsonParser, (req, res) => {
 
   try {
     var decoded = jwt.verify(token[1], 'gsfbsandfkams75rfdkjne28ednks');
+    console.log(decoded)
   } catch(err) {
     return res.status(406).json({
       message: "Invalid token",
@@ -235,7 +237,7 @@ app.post("/orders", jsonParser, (req, res) => {
     });
   }
 
-  if(decoded['isAdmin'] != 'true'){
+  if(decoded['isAdmin'] != true){
     return res.status(406).json({
       message: "User must have admin privileges",
       status: 406
@@ -379,6 +381,7 @@ app.post("/login", jsonParser, (req, res) => {
         userId: userId,
         isAdmin: isAdmin,
       };
+      console.log(user)
       var token = jwt.sign(user, privateKey, { expiresIn: '3000s' });
       let object = {
         token : token,
