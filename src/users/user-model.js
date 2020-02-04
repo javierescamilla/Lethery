@@ -6,6 +6,7 @@ let userSchema = mongoose.Schema({
     email : {type : String},
     password : {type : String},
     firstName : {type : String},
+    isAdmin : {type : Boolean},
     lastName : {type : String},
     shippingAddress : {type : String},
     shippingZipCode : {type : String},
