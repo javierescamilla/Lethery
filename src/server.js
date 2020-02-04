@@ -242,16 +242,16 @@ app.post("/products", jsonParser, (req, res) => {
 });
 
 app.post("/orders", jsonParser, (req, res) => {
-  let userId = req.body.userId;
   let items = req.body.items;
   let total = req.body.total;
   let timestamp = req.body.timestamp;
   let token = req.headers.authorization;
   token = token.split(" ")
 
+  let decoded
+
   try {
-    var decoded = jwt.verify(token[1], 'gsfbsandfkams75rfdkjne28ednks');
-    console.log(decoded)
+    decoded = jwt.verify(token[1], 'gsfbsandfkams75rfdkjne28ednks');
   } catch(err) {
     return res.status(406).json({
       message: "Invalid token",
@@ -259,12 +259,7 @@ app.post("/orders", jsonParser, (req, res) => {
     });
   }
 
-  if(decoded['isAdmin'] != true){
-    return res.status(406).json({
-      message: "User must have admin privileges",
-      status: 406
-    });
-  }
+  let userId = decoded['userId']
 
   let newOrder = {
     userId: userId,
