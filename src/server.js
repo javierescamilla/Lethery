@@ -53,7 +53,8 @@ app.get("/users/:userId", (req, res) => {
 });
 
 app.get("/products", (req, res) => {
-  const { category, name, minRange, maxRange } = req.query;
+  const { category, name, minRange, maxRange, newest } = req.query;
+  const PRODUCTS_PER_PAGE = 6
   let params = {};
   let priceRange = {};
   if (category) {
@@ -72,6 +73,19 @@ app.get("/products", (req, res) => {
   }
   if (minRange & maxRange) {
     params["price"] = priceRange;
+  }
+  if(newest){
+    ProductMethods.getNumberOfProducts(PRODUCTS_PER_PAGE)
+      .then(productResponse => {
+        return res.status(200).json(productResponse);
+      })
+      .catch(error => {
+        res.statusMessage = "Something went wrong with the DB. Try again later.";
+        return res.status(500).json({
+          status: 500,
+          message: "Something went wrong with the DB. Try again later."
+        });
+      });
   }
   ProductMethods.getProducts(params)
     .then(productResponse => {

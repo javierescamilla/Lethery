@@ -23,6 +23,16 @@ let ProductMethods = {
                 });
             
     },
+    getNumberOfProducts : function(numberOdProducts){
+        return ProductVar.find().limit(numberOdProducts)
+				.then( productResponse => {
+					return productResponse;
+				})
+				.catch( error => {
+					throw Error( error );
+                });
+            
+    },
     postProduct : function(productInfo){
         return ProductVar.create(productInfo)
                 .then( productResponse => {
