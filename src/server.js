@@ -101,14 +101,15 @@ app.get("/products", (req, res) => {
     });
 });
 
-app.get("/orders/:userId", (req, res) => {
-  let userId = req.params.userId;
+app.get("/orders", (req, res) => {
   let params = {};
   let token = req.headers.authorization;
   token = token.split(" ")
 
+  let decoded
+
   try {
-    var decoded = jwt.verify(token[1], 'gsfbsandfkams75rfdkjne28ednks');
+    decoded = jwt.verify(token[1], 'gsfbsandfkams75rfdkjne28ednks');
     console.log(decoded)
   } catch(err) {
     return res.status(406).json({
@@ -116,6 +117,8 @@ app.get("/orders/:userId", (req, res) => {
       status: 406
     });
   }
+
+  let userId = decoded['userId']
 
   if (!userId) {
     res.statusMessage = "Missing userId";

@@ -3,16 +3,16 @@ mongoose.Promise = global.Promise;
 
 let orderSchema = mongoose.Schema({
     userId : {type : String},
-    items: {
-        productId : {type : String},
-        price: {type : Number},
-        name : {type : String},
-        category : {type : String},
-        description : {type : String},
-        imageUrl : {type : String},
-        color : {type: String},
-        ammount : {type: Number}
-    },
+    items: [
+        {productId : String},
+        {price : Number},
+        {name :  String},
+        {category : String},
+        {description :  String},
+        {imageUrl :  String},
+        {color :  String},
+        {ammount : Number}
+    ],
     total : {type : Number},
     timestamp : {type : Number},
 })
