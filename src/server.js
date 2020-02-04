@@ -2,6 +2,7 @@ let express = require("express");
 let morgan = require("morgan");
 let mongoose = require("mongoose");
 let uuid = require("uuid4");
+let AWS = require("aws-sdk");
 let app = express();
 let bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
@@ -13,6 +14,8 @@ let { UserMethods } = require("./users/user-model");
 let { ProductMethods } = require("./products/products-model");
 let { OrderMethods } = require("./orders/order-model");
 let { DATABASE_URL, PORT } = require("./config");
+
+const s3 = new AWS.S3();
 
 mongoose.Promise = global.Promise;
 
@@ -226,7 +229,6 @@ app.post("/orders", jsonParser, (req, res) => {
     total: total,
     timestamp: timestamp
   };
-
   OrderMethods.postSortedOrder(newOrder)
     .then(userResponse => {
       return res.status(201).json(userResponse);
@@ -367,6 +369,29 @@ app.post("/login", jsonParser, (req, res) => {
         error: "The user does not exist",
         status: 500
       });
+    });
+});
+
+app.get("/s3-signed-url", (req, res) => {
+  const { imageName } = req.query;
+
+  if (!imageName) {
+    res.statusMessage = "The imageName parameter is required";
+    return res.status(406).send();
+  }
+
+  const params = {
+    Bucket: "final-project-web-dev",
+    Key: `images/${imageName}`,
+    ContentType: "image/*",
+    Expires: 300
+  };
+
+  s3.getSignedUrlPromise("putObject", params)
+    .then(url => res.status(201).json({ url }))
+    .catch(err => {
+      res.statusMessage = "Internal server error";
+      return res.status(501).send();
     });
 });
 
