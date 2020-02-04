@@ -365,6 +365,25 @@ app.delete("/users/:userId", (req, res) => {
 
 app.delete("/products/:productId", (req, res) => {
   let productId = req.params.productId;
+  let token = req.headers.authorization;
+  token = token.split(" ")
+
+  try {
+    var decoded = jwt.verify(token[1], 'gsfbsandfkams75rfdkjne28ednks');
+    console.log(decoded)
+  } catch(err) {
+    return res.status(406).json({
+      message: "Invalid token",
+      status: 406
+    });
+  }
+
+  if(decoded['isAdmin'] != true){
+    return res.status(406).json({
+      message: "User must have admin privileges",
+      status: 406
+    });
+  }
   if (!productId) {
     res.statusMessage = "Missing field id";
     return res.status(406).json({
