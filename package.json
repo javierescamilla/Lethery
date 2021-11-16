@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/javierescamilla/Lethery#readme",
   "dependencies": {
-    "aws-sdk": "^2.610.0",
+    "aws-sdk": "^2.814.0",
     "bcrypt": "^3.0.7",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
