@@ -23,7 +23,7 @@
   "dependencies": {
     "aws-sdk": "^2.610.0",
     "bcrypt": "^3.0.7",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.8.11",
     "morgan": "^1.9.1",
